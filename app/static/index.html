@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经营分析 · 订单 / 退款 / 投放</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="title">
+    <h1>经营分析</h1>
+    <span class="subtitle">订单金额 · 退款金额 · 投放花费（三种粒度，先汇总再对齐）</span>
+  </div>
+  <div class="top-actions">
+    <div class="mode-switch" role="tablist" aria-label="口径模式">
+      <button id="mode-correct" class="seg active" role="tab" aria-selected="true">正确口径</button>
+      <button id="mode-wrong" class="seg seg-danger" role="tab" aria-selected="false">错误示例（直接关联）</button>
+    </div>
+    <button id="btn-export" class="btn">导出结果（含口径与筛选）</button>
+  </div>
+</header>
+
+<main>
+  <!-- 筛选与口径配置 -->
+  <section class="panel filters">
+    <div class="frow">
+      <label>日期从 <input type="date" id="f-date-from"></label>
+      <label>至 <input type="date" id="f-date-to"></label>
+      <label>门店
+        <select id="f-store"><option value="">全部门店</option></select>
+      </label>
+      <label>渠道
+        <select id="f-channel"><option value="">全部渠道</option></select>
+      </label>
+      <fieldset class="gb">
+        <legend>分组维度</legend>
+        <label><input type="checkbox" id="gb-date" checked> 日期</label>
+        <label><input type="checkbox" id="gb-store"> 门店</label>
+        <label><input type="checkbox" id="gb-channel"> 渠道</label>
+      </fieldset>
+    </div>
+    <div class="frow">
+      <fieldset class="caliber">
+        <legend>口径配置（修改后自动重新预览计算过程）</legend>
+        <label>退款归属
+          <select id="c-refund-basis">
+            <option value="refund_date">按退款发生日</option>
+            <option value="order_date">按原订单日期</option>
+          </select>
+        </label>
+        <label>空白渠道
+          <select id="c-blank-channel">
+            <option value="keep">归入「（空白）」</option>
+            <option value="exclude">剔除空白渠道记录</option>
+          </select>
+        </label>
+      </fieldset>
+      <button id="btn-run" class="btn btn-primary">查询</button>
+    </div>
+  </section>
+
+  <!-- 指标卡片：点击下钻 -->
+  <section class="cards" id="cards"></section>
+
+  <!-- 趋势图 -->
+  <section class="panel">
+    <h2>每日趋势 <span class="hint" id="chart-note"></span></h2>
+    <div id="chart" class="chart" role="img" aria-label="订单、退款、投放每日趋势柱状图"></div>
+    <div id="chart-legend" class="legend"></div>
+  </section>
+
+  <!-- 正确模式：结果表 / 错误模式：对照表 -->
+  <section class="panel" id="result-panel">
+    <h2 id="result-title">汇总结果</h2>
+    <div id="spend-note" class="notice warn hidden"></div>
+    <div class="table-wrap"><table id="result-table"></table></div>
+    <div id="dup-panel" class="hidden"></div>
+  </section>
+
+  <!-- 计算过程（SQL 预览） -->
+  <section class="panel">
+    <h2>计算过程 <span class="hint">每次查询 / 修改口径后重新生成，展示的即实际执行的 SQL</span></h2>
+    <div id="sql-steps"></div>
+  </section>
+
+  <details class="panel notes">
+    <summary>口径与设计说明</summary>
+    <ul id="notes-list"></ul>
+  </details>
+</main>
+
+<!-- 下钻抽屉 -->
+<div id="drawer-mask" class="drawer-mask hidden"></div>
+<aside id="drawer" class="drawer hidden" aria-label="指标明细">
+  <div class="drawer-head">
+    <h3 id="drawer-title">明细</h3>
+    <button id="drawer-close" class="btn btn-ghost">关闭 ✕</button>
+  </div>
+  <div id="drawer-bucket" class="bucket"></div>
+  <div id="drawer-note" class="notice warn hidden"></div>
+  <div class="table-wrap"><table id="drawer-table"></table></div>
+  <h4>实际执行的 SQL</h4>
+  <pre id="drawer-sql" class="sql"></pre>
+</aside>
+
+<div id="tooltip" class="tooltip hidden"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
